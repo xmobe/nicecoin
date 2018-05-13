@@ -1,4 +1,4 @@
-# nicecoin
+# Nicecoin [![NiceCoin license](https://img.shields.io/github/license/xmobe-com/nicecoin.svg)](https://github.com/xmobe-com/nicecoin)
 
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://xmobe.com)
 [![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)](https://quanganh206.github.io)
@@ -10,4 +10,10 @@
 [![Open Source Helpers](https://www.codetriage.com/xmobe-com/nicecoin/badges/users.svg)](https://www.codetriage.com/xmobe-com/nicecoin)
 
 
+[![GitHub issues](https://img.shields.io/github/issues/xmobe-com/nicecoin.svg)](https://github.com/xmobe-com/nicecoin/issues)
+[![GitHub stars](https://img.shields.io/github/stars/xmobe-com/nicecoin.svg)](https://github.com/xmobe-com/nicecoin/stargazers)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/xmobe-com/nicecoin.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fxmobe-com%2Fnicecoin)
+
+
 Nicecoin is my personal project to learning about BitCoin and BitCoinJ. 
+
