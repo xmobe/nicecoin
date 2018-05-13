@@ -14,29 +14,100 @@
  * limitations under the License.
  */
 
+import * as Crypto from 'crypto';
+
 /**
  * A Block hold all Block information
- */ 
+ */
 export class Block {
     public index: number;
     public timestamp: number;
-    public previousHash: string;
-    public data: string;
+    public previousHash: Uint8Array;
+    public data: any;
 
-    public hash: string;
-    difficult: number;
-    nonce: number;
-    
+    private _hash: Uint8Array;
+    public difficult: number;
+    public _nonce: number;
 
-    constructor(index: number, timestamp: number, previousHash: string, data: string, hash: string) {
+    /**
+     * @constructor Creates an instance of block.
+     * @param index 
+     * @param timestamp 
+     * @param previousHash 
+     * @param data 
+     * @param difficult 
+     * @param nonce 
+     */
+    constructor(index: number, timestamp: number, previousHash: Uint8Array, data: string, difficult: number, nonce: number) {
         this.index = index;
         this.timestamp = timestamp;
-        this.hash = hash;
-        this.data = data;
         this.previousHash = previousHash;
+        this.data = data;
+
+        this.difficult = difficult;
+        this._nonce = nonce;
     }
 
-    calculateHash() {
-        
+    /**
+     * Calculates hash
+     * @returns hash 
+     */
+    private async calculateHash(): Promise<Uint8Array> {
+        let self = this;
+
+        let str = '';
+        for (let attr in self) {
+            if (attr != '_hash') {
+                str += self[attr];
+            }
+        }
+
+        const hashString = await
+            Crypto.createHash('SHA256')
+                .update(str)
+                .digest();
+
+        return hashString;
+    }
+
+    /**
+     * Gets hash
+     * @returns hash 
+     */
+    public async getHash(): Promise<Uint8Array> {
+        if (this._hash !== null) {
+            this._hash = await this.calculateHash();
+        }
+
+        return this._hash;
+    }
+
+    public async getHashAsString(): Promise<string> {
+        let hash = await this.getHash();
+        return Buffer.from(hash).toString('hex');
+    }
+
+    /**
+     * Gets nonce
+     */
+    public get nonce(): number {
+        return this._nonce;
+    }
+
+    /**
+     * Sets nonce
+     */
+    public set nonce(_nonce: number) {
+        this._nonce = _nonce;
+        this._hash = null;
+    }
+
+
+    public serialize() {
+
+    }
+
+    public deserialize() {
+
     }
 }
