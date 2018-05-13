@@ -4,7 +4,15 @@
   "description": "NiceCoin is a simple coin in my journey with BlockChain and try to take the power of Typescript",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm -Rf dist",
+    "build": "npm run clean & tsc",
+    "dev": "tsc --watch & nodemon dist",
+    "test": "nyc --reporter=html --reporter=text mocha ./dist/test/**/**/*.spec.js -R spec",
+    "coveralls": "nyc report --reporter=lcov",
+    "lint": "eslint src --ext ts", 
+    "start": "concurrently \"npm run gulp-serve\" \"nodemon dist/index.js\"",
+    "doc": "typedoc --out ./docs ./src/**/*.ts --mode modules",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -20,5 +28,35 @@
   "bugs": {
     "url": "https://github.com/xmobe-com/nicecoin/issues"
   },
-  "homepage": "https://github.com/xmobe-com/nicecoin#readme"
+  "homepage": "https://github.com/xmobe-com/nicecoin#readme",
+  "devDependencies": {
+    "@types/express": "^4.11.1",
+    "@types/gulp": "^4.0.5",
+    "@types/mocha": "^5.2.0",
+    "@types/node": "^10.0.6",
+    "@types/socket.io": "^1.4.33",
+    "@types/ws": "^4.0.2",
+    "chai": "^4.1.2",
+    "concurrently": "^3.5.1",
+    "coveralls": "^3.0.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-promise": "^3.7.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.1.1",
+    "nyc": "^11.7.2",
+    "supertest": "^3.0.0",
+    "ts-node": "^6.0.3",
+    "tslint": "^5.10.0",
+    "typedoc": "^0.11.1",
+    "typescript": "^2.8.3",
+    "typescript-eslint-parser": "^15.0.0"
+  },
+  "dependencies": {
+    "@xmobe/user": "^1.0.2",
+    "body-parser": "^1.18.2",
+    "crypto": "^1.0.1",
+    "express": "^4.16.3",
+    "socket.io": "^2.1.0"
+  }
 }
