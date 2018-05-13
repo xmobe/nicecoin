@@ -1,0 +1,24 @@
+{
+  "name": "@xmobe/nicecoin",
+  "version": "1.0.0",
+  "description": "NiceCoin is a simple coin in my journey with BlockChain and try to take the power of Typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xmobe-com/nicecoin.git"
+  },
+  "keywords": [
+    "nicecoin",
+    "blockchain",
+    "p2p"
+  ],
+  "author": "quanganh@aiti.com.vn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xmobe-com/nicecoin/issues"
+  },
+  "homepage": "https://github.com/xmobe-com/nicecoin#readme"
+}
