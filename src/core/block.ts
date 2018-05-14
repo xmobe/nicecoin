@@ -25,9 +25,12 @@ export class Block {
     public previousHash: Uint8Array;
     public data: any;
 
-    private _hash: Uint8Array;
-    public difficult: number;
-    public _nonce: number;
+    /**
+     * Store Hash  of block. If null getHash() will recalculate it.
+     */
+    private hash: Uint8Array;
+    public difficult: number; // 
+    public nonce: number;
 
     /**
      * @constructor Creates an instance of block.
@@ -45,7 +48,7 @@ export class Block {
         this.data = data;
 
         this.difficult = difficult;
-        this._nonce = nonce;
+        this.nonce = nonce;
     }
 
     /**
@@ -53,11 +56,12 @@ export class Block {
      * @returns hash 
      */
     private async calculateHash(): Promise<Uint8Array> {
+        console.time('calculateHash Block ' + this.index);
         let self = this;
 
         let str = '';
         for (let attr in self) {
-            if (attr != '_hash') {
+            if (attr != 'hash') {
                 str += self[attr];
             }
         }
@@ -67,6 +71,7 @@ export class Block {
                 .update(str)
                 .digest();
 
+        console.timeEnd('calculateHash Block ' + this.index);
         return hashString;
     }
 
@@ -75,38 +80,50 @@ export class Block {
      * @returns hash 
      */
     public async getHash(): Promise<Uint8Array> {
-        if (this._hash !== null) {
-            this._hash = await this.calculateHash();
+        if (this.hash == null) {
+            this.hash = await this.calculateHash();
+            return this.hash;
+        } else {
+            return this.hash;
         }
-
-        return this._hash;
     }
 
     public async getHashAsString(): Promise<string> {
         let hash = await this.getHash();
-        return Buffer.from(hash).toString('hex');
+        return Buffer.from(hash).toString('hex');;
     }
 
     /**
      * Gets nonce
+     * @returns nonce 
      */
-    public get nonce(): number {
-        return this._nonce;
+    public getNonce(): number {
+        return this.nonce;
     }
 
     /**
      * Sets nonce
+     * @param nonce 
      */
-    public set nonce(_nonce: number) {
-        this._nonce = _nonce;
-        this._hash = null;
+    public setNonce(nonce: number) {
+        this.nonce = nonce;
+        this.hash = null;
     }
 
+    public solve() {
 
+    }
+
+    /**
+     * Serializes block
+     */
     public serialize() {
 
     }
 
+    /**
+     * Deserializes block
+     */
     public deserialize() {
 
     }
