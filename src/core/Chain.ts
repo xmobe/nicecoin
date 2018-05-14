@@ -153,10 +153,15 @@ export class Chain {
 
         const requiredPrefix: string = '0'.repeat(difficult);
 
-        // if (hashString.startsWith(requiredPrefix)) {
-        // console.log(Buffer.from(hash).toString('hex'));
-        console.log(hashString);
-        // }
+        if (hashString.startsWith(requiredPrefix) && difficult < 8) {
+            console.log(Buffer.from(hash).toString('hex'));
+            console.log(hashString);
+        } else if (difficult >= 8) {
+            if (hashString.startsWith(requiredPrefix)) {
+                console.log(Buffer.from(hash).toString('hex'));
+            }
+            console.log(hashString);
+        }
 
         return hashString.startsWith(requiredPrefix);
     }
