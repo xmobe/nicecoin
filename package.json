@@ -6,12 +6,12 @@
   "scripts": {
     "clean": "rm -Rf dist",
     "build": "npm run clean & tsc",
+    "start": "npm run build && node ./dist/index.js",
     "dev": "tsc --watch & nodemon dist",
     "pre-test": "rm -Rf dist-test && tsc -p tsconfig.test.json",
     "test": "npm run pre-test && nyc --reporter=html --reporter=text mocha ./dist-test/**/**/*.spec.js -R spec",
     "coveralls": "nyc report --reporter=lcov",
     "lint": "eslint src --ext ts",
-    "start": "concurrently \"npm run gulp-serve\" \"nodemon dist/index.js\"",
     "docs": "typedoc --out ./docs ./src/**/*.ts --mode modules",
     "tsc": "tsc"
   },
@@ -59,6 +59,7 @@
     "body-parser": "^1.18.2",
     "crypto": "^1.0.1",
     "express": "^4.16.3",
+    "faker": "^4.1.0",
     "socket.io": "^2.1.0",
     "sqlite3": "^4.0.0"
   }

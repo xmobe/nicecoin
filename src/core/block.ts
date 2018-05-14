@@ -15,18 +15,17 @@
  */
 
 import * as Crypto from 'crypto';
-import { hasMagic } from 'glob';
-
+import { byte2BinaryString } from './Utils';
 /**
  * A Block hold all Block information
  */
 export class Block {
     public index: number;
     public timestamp: number;
-    public previousHash: Uint8Array;
+    public previousHash: Buffer;
     public data: any;
 
-    private _hash: Uint8Array;
+    private _hash: Buffer;
     public difficult: number;
     public _nonce: number;
 
@@ -40,7 +39,7 @@ export class Block {
      * @param difficult 
      * @param nonce 
      */
-    constructor(index: number, timestamp: number, previousHash: Uint8Array, data: any, difficult: number, nonce: number) {
+    constructor(index: number, timestamp: number, previousHash: Buffer, data: any, difficult: number, nonce: number) {
         this.index = index;
         this.timestamp = timestamp;
         this.previousHash = previousHash;
@@ -50,11 +49,8 @@ export class Block {
         this._nonce = nonce;
     }
 
-
-
-    private async calculateHash(): Promise<Uint8Array> {
+    private async calculateHash(): Promise<Buffer> {
         let self = this;
-
         let str = '';
         for (let attr in self) {
             if (attr != '_hash') {
@@ -66,11 +62,11 @@ export class Block {
             Crypto.createHash('SHA256')
                 .update(str)
                 .digest();
-
+                
         return hash;
     }
 
-    public async getHash(): Promise<Uint8Array> {
+    public async getHash(): Promise<Buffer> {
         if (this._hash !== null) {
             this._hash = await this.calculateHash();
         }

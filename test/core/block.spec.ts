@@ -6,14 +6,27 @@ import { Block } from '../../src/core/block';
 describe('Block', () => {
     it("Should create New Block with data 'Test Block'", () => {
         const now = new Date();
+        now.setDate(20);
+        now.setMonth(5);
+        now.setFullYear(2017);
+        now.setHours(10);
+        now.setMinutes(9);
+        now.setSeconds(0);
+        console.log(now.toString());
         let block = new Block(0, now.getTime(), null, 'Test Block', 5, 0);
         expect(block.data).to.equal('Test Block');
     });
 
     it("Should create valid Hash", () => {
         const now = new Date();
+        now.setDate(20);
+        now.setMonth(5);
+        now.setFullYear(2017);
+        now.setHours(10);
+        now.setMinutes(9);
+        now.setSeconds(0);
+        console.log(now.toString());
         let block: Block = new Block(1, now.getTime(), null, 'Test Block', 5, 0);
-
 
         block.getHash()
             .then(data => {
@@ -44,7 +57,6 @@ describe('Block', () => {
                 };
 
                 let byte2String = (n): string => {
-                    
                     return (('000000000' + n.toString(2)).substr(-8));
                 }
 
@@ -56,6 +68,10 @@ describe('Block', () => {
                 for (let i = 0; i < hash.length; i++) {
                     str += byte2String(hash[i]) + ' ';
                 }
+
+                let str2 = '';
+                let buffer = Buffer.from(hash)
+                // buffer << 2
                 // console.log(byte2String(hash[0]));
                 // console.log(byte2String(hash[1]));
 
@@ -65,7 +81,6 @@ describe('Block', () => {
 
                 block.getHashAsString()
                     .then(hashString => {
-                        console.log(hashString);
                         expect(hashString).to.equal(str1);
                     });
             });
