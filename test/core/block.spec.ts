@@ -12,12 +12,14 @@ describe('Block', () => {
 
     it("Should create valid Hash", () => {
         const now = new Date();
-        let block = new Block(1, now.getTime(), null, 'Test Block', 5, 0);
+        let block: Block = new Block(1, now.getTime(), null, 'Test Block', 5, 0);
+
 
         block.getHash()
             .then(data => {
                 let hash = data;
                 let str1 = Buffer.from(hash).toString('hex');
+                console.log(str1);
 
                 let hexToBinary = (s: string): string => {
                     let ret: string = '';
@@ -42,6 +44,7 @@ describe('Block', () => {
                 };
 
                 let byte2String = (n): string => {
+                    
                     return (('000000000' + n.toString(2)).substr(-8));
                 }
 
@@ -59,8 +62,10 @@ describe('Block', () => {
                 // console.log((parseInt(str1, 16)).toString(2));
                 console.log(str);
                 console.log(hexToBinary(str1));
+
                 block.getHashAsString()
                     .then(hashString => {
+                        console.log(hashString);
                         expect(hashString).to.equal(str1);
                     });
             });
