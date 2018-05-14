@@ -15,6 +15,7 @@
  */
 
 import * as Crypto from 'crypto';
+import { hasMagic } from 'glob';
 
 /**
  * A Block hold all Block information
@@ -29,16 +30,17 @@ export class Block {
     public difficult: number;
     public _nonce: number;
 
-    /**
-     * @constructor Creates an instance of block.
+    /** 
+     * @constructor
      * @param index 
      * @param timestamp 
      * @param previousHash 
      * @param data 
+     * @param hash 
      * @param difficult 
      * @param nonce 
      */
-    constructor(index: number, timestamp: number, previousHash: Uint8Array, data: string, difficult: number, nonce: number) {
+    constructor(index: number, timestamp: number, previousHash: Uint8Array, data: any, difficult: number, nonce: number) {
         this.index = index;
         this.timestamp = timestamp;
         this.previousHash = previousHash;
@@ -48,10 +50,8 @@ export class Block {
         this._nonce = nonce;
     }
 
-    /**
-     * Calculates hash
-     * @returns hash 
-     */
+
+
     private async calculateHash(): Promise<Uint8Array> {
         let self = this;
 
@@ -62,18 +62,14 @@ export class Block {
             }
         }
 
-        const hashString = await
+        const hash = await
             Crypto.createHash('SHA256')
                 .update(str)
                 .digest();
 
-        return hashString;
+        return hash;
     }
 
-    /**
-     * Gets hash
-     * @returns hash 
-     */
     public async getHash(): Promise<Uint8Array> {
         if (this._hash !== null) {
             this._hash = await this.calculateHash();
@@ -83,25 +79,17 @@ export class Block {
     }
 
     public async getHashAsString(): Promise<string> {
-        let hash = await this.getHash();
+        const hash = await this.getHash();
         return Buffer.from(hash).toString('hex');
     }
 
-    /**
-     * Gets nonce
-     */
     public get nonce(): number {
         return this._nonce;
     }
 
-    /**
-     * Sets nonce
-     */
     public set nonce(_nonce: number) {
         this._nonce = _nonce;
-        this._hash = null;
     }
-
 
     public serialize() {
 
