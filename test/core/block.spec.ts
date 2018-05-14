@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { Block } from '../../src/core/block';
+import { Block } from '../../src/core/Block';
 
 
 describe('Block', () => {

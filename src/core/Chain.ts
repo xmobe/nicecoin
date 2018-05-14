@@ -15,7 +15,7 @@
  */
 
 import * as Crypto from 'crypto';
-import { Block } from './block';
+import { Block } from './Block';
 import { byte2BinaryString, getCurrentTimestamp } from './Utils';
 
 // in seconds 
