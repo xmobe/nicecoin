@@ -58,7 +58,7 @@ export class Chain {
         now.setMinutes(9);
         now.setSeconds(0);
 
-        let genesisBlock = new Block(0, (now.getTime() / 1000), null, 'NiceCoin Genesis Block', 24, 0);
+        let genesisBlock = new Block(0, (now.getTime() / 1000), null, 'NiceCoin Genesis Block', 14, 0);
         let hash = await genesisBlock.getHashAsString();
 
         console.log('Anything Human can understand!!!');
