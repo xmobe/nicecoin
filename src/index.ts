@@ -26,9 +26,18 @@ Chain
         let genesisBlock: Block = chain.getCurrentBlock();
 
         // chain.mine(faker.company.companyName());
-        setInterval(() => {
+        let i = 0;
+        let handler = setInterval(() => {
             let data = faker.company.companyName();
             console.log('Block Data: ', data);
-            chain.mine(data);
-        }, 5000);
+            
+            chain.mine(data)
+            
+
+            i++;
+
+            if (i == 100) {
+                clearInterval(handler);
+            }
+        }, 3000); // time to mine block not right
     });

@@ -19,11 +19,11 @@ import { Block } from './Block';
 import { byte2BinaryString, getCurrentTimestamp } from './Utils';
 
 // in seconds 
-const BLOCK_GENERATION_INTERVAL: number = 10 * 1000;
+const BLOCK_GENERATION_INTERVAL: number = 5;
 // in blocks 
 const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10;
 const TIME_EXPECTED: number = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
-const MINUTES: number = 60 * 1000;
+const MINUTES: number = 60;
 
 /**
  * Chain
@@ -58,7 +58,7 @@ export class Chain {
         now.setMinutes(9);
         now.setSeconds(0);
 
-        let genesisBlock = new Block(0, (now.getTime()), null, 'NiceCoin Genesis Block', 5, 0);
+        let genesisBlock = new Block(0, (now.getTime() / 1000), null, 'NiceCoin Genesis Block', 24, 0);
         let hash = await genesisBlock.getHashAsString();
 
         console.log('Anything Human can understand!!!');
@@ -86,12 +86,14 @@ export class Chain {
         const prevHash = await prevBlock.getHash();
         const newBlock: Block = await this.PoW(nextIndex, timestamp, prevHash, blockData, difficulty)
 
-        let isAdded = await this.addBlockToChain(newBlock);
-        if (isAdded) {
-            console.log(newBlock.index, newBlock.timestamp, newBlock.difficult);
+        if (newBlock) {
+            let isAdded = await this.addBlockToChain(newBlock);
+            if (isAdded) {
+                console.log(newBlock.index, newBlock.timestamp, newBlock.difficult);
+            }
+            console.timeEnd('Mine Block ' + blockData + ' in');
+            return newBlock;
         }
-        console.timeEnd('Mine Block ' + blockData + ' in');
-        return newBlock;
     }
 
     private async addBlockToChain(block: Block): Promise<boolean> {
@@ -143,7 +145,7 @@ export class Chain {
      * @param hash 
      * @param difficult 
      */
-    public async hashMatchesDifficulty(hash: Buffer, difficult: number): Promise<boolean> {
+    public async hashMatchesDifficulty(hash: Buffer, difficult: number, nonce: number): Promise<boolean> {
         // TODO: Need improve, working with Binary data
         let hashString: string = '';
 
@@ -160,10 +162,34 @@ export class Chain {
             if (hashString.startsWith(requiredPrefix)) {
                 console.log(Buffer.from(hash).toString('hex'));
             }
-            console.log(hashString);
+            let check = (nonce % 1000);
+            if (check === 0) {
+                console.log(hashString);
+            }
         }
 
         return hashString.startsWith(requiredPrefix);
+    }
+
+    /**
+     * hashMatchesDifficulty2 working with Buffer Binary data, 
+     * The Proof-of-work puzzle is to find a block hash, that has a specific number of zeros prefixing it. 
+     * The difficulty property defines how many prefixing zeros the block hash must have , in order for the block to be valid.
+     * 
+     * @param hash 
+     * @param difficult 
+     */
+    public hashMatchesDifficulty2(hash: Buffer, difficult: number): boolean {
+        for (var i = 0; i < difficult; i++) {
+            const byte = ~~(i / 8);
+            const bit = i % 8;
+            const hashByte = hash[byte];
+
+            if (hashByte & Math.pow(2, (7 - bit))) {
+                return false;
+            }
+        };
+        return true;
     }
 
     /**
@@ -184,12 +210,24 @@ export class Chain {
         while (true) {
             let block = new Block(index, timestamp, previousHash, data, difficulty, nonce)
             const hash: Buffer = await block.getHash();
-            let isMatchDifficulty = await this.hashMatchesDifficulty(hash, difficulty);
+            // let isMatchDifficulty = await this.hashMatchesDifficulty(hash, difficulty, nonce);
+            let isMatchDifficulty = this.hashMatchesDifficulty2(hash, difficulty);
+
             if (isMatchDifficulty) {
+                console.log(Buffer.from(hash).toString('hex'));
+                let hashString: string = '';
+
+                for (let i = 0; i < 2; i++) {
+                    hashString += byte2BinaryString(hash[i]) + ' ';
+                }
+                console.log(hashString);
                 return block;
             }
 
             nonce++;
+            if (nonce === 1000) {
+                return null;
+            }
         }
     }
 
@@ -197,6 +235,11 @@ export class Chain {
      * Gets adjusted difficulty
      * The expected time represents the case where the hashrate matches exactly the current difficulty. 
      * We either increase or decrease the difficulty by one if the time taken is at least two times greater or smaller than the expected difficulty.
+     * 
+     * To calculate the difficulty for the next Ethereum block, you calculate the time it took to mine the previous block, 
+     * and if that time difference was greater than the goal time, then the difficulty goes down to make mining the next 
+     * block quicker. If it was less than the time goal, then difficulty goes up to attempt to mine the next block quicker.
+     * 
      * @param latestBlock 
      * @returns 
      */
@@ -204,6 +247,7 @@ export class Chain {
         const preAdjustmentBlock = this.blocks[this.blocks.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
 
         const timeTaken: number = latestBlock.timestamp - preAdjustmentBlock.timestamp;
+        console.log('timeTaken to mine 5 blocks: ', timeTaken);
 
         if (timeTaken < TIME_EXPECTED / 2) {
             return preAdjustmentBlock.difficult + 1;
@@ -217,12 +261,14 @@ export class Chain {
     /**
      * Gets difficulty
      * For every 10 blocks that is generated, we check if the time that took to generate those blocks are larger or smaller than the expected time.
+     * 
      * @returns difficulty 
      */
     public getDifficulty(): number {
         const latestBlock = this.blocks[this.blocks.length - 1];
-
-        if (latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL === 0 && latestBlock.index !== 0) {
+        console.log('check difficulty: ', latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL);
+        if (((latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL) === 0) && (latestBlock.index !== 0)) {
+            console.log('Need adjust the Difficulty');
             return this.getAdjustedDifficulty(latestBlock);
         } else {
             return latestBlock.difficult;
@@ -238,7 +284,9 @@ export class Chain {
      * @returns true if valid timestamp 
      */
     public isValidTimestamp(block: Block, prevBlock: Block): boolean {
-
+        console.log('1. ', prevBlock.timestamp, (prevBlock.timestamp - MINUTES), (prevBlock.timestamp - MINUTES) < block.timestamp);
+        console.log('2. ', block.timestamp, (block.timestamp - MINUTES), (block.timestamp - MINUTES) < getCurrentTimestamp());
+        console.log('3. ', ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp()))
         return ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp());
     }
 }

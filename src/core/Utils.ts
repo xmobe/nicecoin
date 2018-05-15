@@ -25,5 +25,5 @@ export const byte2BinaryString = (n): string => {
 }
 
 export const getCurrentTimestamp = (): number => {
-    return ((new Date()).getTime());
+    return ((new Date()).getTime() / 1000);
 }
