@@ -27,17 +27,15 @@ Chain
 
         // chain.mine(faker.company.companyName());
         let i = 0;
+
         let handler = setInterval(() => {
             let data = faker.company.companyName();
-            console.log('Block Data: ', data);
-            
+            // console.log('Block Data: ', data);
             chain.mine(data)
-            
-
+        
             i++;
-
-            if (i == 100) {
+            if (i == 50) {
                 clearInterval(handler);
             }
-        }, 3000); // time to mine block not right
+        }, 5000); // time to mine block not right
     });

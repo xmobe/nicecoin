@@ -15,7 +15,9 @@
  */
 
 import * as Crypto from 'crypto';
-import { byte2BinaryString } from './Utils';
+import { byte2BinaryString, getCurrentTimestamp } from './Utils';
+import { Transaction } from './Transaction';
+
 /**
  * A Block hold all Block information
  */
@@ -41,7 +43,7 @@ export class Block {
      */
     constructor(index: number, timestamp: number, previousHash: Buffer, data: any, difficult: number, nonce: number) {
         this.index = index;
-        this.timestamp = timestamp;
+        this.timestamp = getCurrentTimestamp();
         this.previousHash = previousHash;
         this.data = data;
 
@@ -49,7 +51,14 @@ export class Block {
         this._nonce = nonce;
     }
 
-    private async calculateHash(): Promise<Buffer> {
+    // constructor(index: number, previousHash: Buffer, transactions: Transaction[]) {
+    //     this.index = index;
+    //     this.timestamp = getCurrentTimestamp();
+    //     this.previousHash = previousHash;
+    //     this.data = transactions;
+    // }
+
+    private calculateHash(): Buffer {
         let self = this;
         let str = '';
         for (let attr in self) {
@@ -58,24 +67,24 @@ export class Block {
             }
         }
 
-        const hash = await
+        const hash =
             Crypto.createHash('SHA256')
                 .update(str)
                 .digest();
-                
+
         return hash;
     }
 
-    public async getHash(): Promise<Buffer> {
+    public getHash(): Buffer {
         if (this._hash !== null) {
-            this._hash = await this.calculateHash();
+            this._hash = this.calculateHash();
         }
 
         return this._hash;
     }
 
-    public async getHashAsString(): Promise<string> {
-        const hash = await this.getHash();
+    public getHashAsString(): string {
+        const hash = this.getHash();
         return Buffer.from(hash).toString('hex');
     }
 

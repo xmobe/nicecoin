@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import * as Crypto from 'crypto';
 import { TxIn } from './TransactionIn';
 import { TxOut } from './TransactionOut';
 
@@ -21,4 +21,28 @@ export class Transaction {
     public id: string;
     public txIns: TxIn[];
     public txOuts: TxOut[];
+
+    public getTransactionId(): string {
+        const txInContent: string = this.txIns
+            .map((txIn: TxIn) => {
+                return txIn.txId + txIn.txOutIndex;
+            })
+            .reduce((a, b) => {
+                return (a + b).toString();
+            });
+
+        const txOutContent: string = this.txOuts
+            .map((txOut: TxOut) => {
+                return txOut.publicKey + txOut.publicKey;
+            })
+            .reduce((a, b) => {
+                return (a + b);
+            });
+
+        this.id = Crypto.createHash('SHA256')
+            .update(txInContent + txOutContent)
+            .digest('hex');
+            
+        return this.id;
+    }
 }

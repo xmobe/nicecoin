@@ -11,10 +11,19 @@ describe('BlockChain', () => {
                 let chain = instance;
                 let genesisBlock = chain.getCurrentBlock();
 
-                setInterval(() => {
-                    chain.mine(faker.company.companyName());
-                }, 5000);
-                expect(genesisBlock.data).to.equal('NiceCoin Genesis Block');
-            })
+                // expect(genesisBlock.index).to.equal(0);
+
+                let blockData = faker.company.companyName();
+
+                let block: Block = chain.mine(blockData);
+                expect(block.index).to.equal(1);
+
+                // chain.mine(blockData)
+                //     .then((block: Block) => {
+                //         console.log(block);
+
+                //         expect(block.index).to.equal(1);
+                //     });
+            });
     });
 });

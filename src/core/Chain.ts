@@ -14,30 +14,41 @@
  * limitations under the License.
  */
 
+var GPU = require('gpu.js');
+
 import * as Crypto from 'crypto';
 import { Block } from './Block';
+import { Transaction } from './Transaction';
+import { UnspentTxOut } from './UTXO';
 import { byte2BinaryString, getCurrentTimestamp } from './Utils';
 
+import { Signale } from 'signale';
+
 // in seconds 
-const BLOCK_GENERATION_INTERVAL: number = 5;
+const BLOCK_GENERATION_INTERVAL: number = 10;
 // in blocks 
 const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10;
 const TIME_EXPECTED: number = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
 const MINUTES: number = 60;
+const COINBASE_AMOUNT: number = 50;
 
 /**
  * Chain
  */
 export class Chain {
-    static instance: Chain = null;
-    public blocks: Block[];
+    private static instance: Chain = null;
+
+    private blocks: Block[];
     private currentBlock: Block = null;
+    private unspentTxOuts: UnspentTxOut[]
+
     /**
      * Creates an instance of chain.
      * @constructor
      */
     private constructor() {
         this.blocks = new Array<Block>();
+        this.unspentTxOuts = new Array<UnspentTxOut>();
     }
 
     static async getInstance(): Promise<Chain> {
@@ -58,15 +69,31 @@ export class Chain {
         now.setMinutes(9);
         now.setSeconds(0);
 
-        let genesisBlock = new Block(0, (now.getTime() / 1000), null, 'NiceCoin Genesis Block', 14, 0);
+        // No transaction area
+        // let genesisBlock = new Block(0, (now.getTime() / 1000), null, 'NiceCoin Genesis Block', 14, 0);
+
+        const genesisTransaction: Transaction = new Transaction();
+        genesisTransaction.id = 'd9c152298c90efeb1628e7a79dc7405485a37c6de8b384ed0077c0ae105f924b';
+        genesisTransaction.txIns = [{ 'signature': '', 'txId': '', 'txOutIndex': 0 }];
+        genesisTransaction.txOuts = [{
+            'publicKey': '044b9214fa338400bd599b2cb53acb78e4dae85e44163240cae0d11b371af7feabe90df572eb8df71a29e0a840c104d3a40782547c6b7c307348683bb5cd6029ad',
+            'amount': 500
+        }];
+        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 15, 0);
+
         let hash = await genesisBlock.getHashAsString();
 
         console.log('Anything Human can understand!!!');
         console.log('Genesis hash: ', hash);
-        // console.log('Genesis ', genesisBlock);
 
         this.blocks.push(genesisBlock);
         this.currentBlock = genesisBlock;
+
+        this.unspentTxOuts = this.processTransactions(this.blocks[0].data, [], 0);
+    }
+
+    public getUnspentTxOuts() {
+        return this.unspentTxOuts;
     }
 
     public getCurrentBlock() {
@@ -77,27 +104,63 @@ export class Chain {
         return this.blocks[this.blocks.length - 1];
     }
 
-    public async mine(blockData: any): Promise<Block> {
-        console.time('Mine Block ' + blockData + ' in');
+    public mine(blockData: any): Block {
+        let signale = new Signale();
         const prevBlock: Block = this.getLatestBlock();
-        const difficulty: number = this.getDifficulty();
         const nextIndex: number = prevBlock.index + 1;
+
+        signale.time('Mine Block ' + nextIndex + ' in');
+        const difficulty: number = this.getDifficulty();
+
         const timestamp: number = getCurrentTimestamp();
-        const prevHash = await prevBlock.getHash();
-        const newBlock: Block = await this.PoW(nextIndex, timestamp, prevHash, blockData, difficulty)
+        const prevHash = prevBlock.getHash();
+
+        // const gpu = new GPU({ model: 'cpu' });
+        // const self = this;
+        // const pow = gpu.createKernel(function (index: number, timestamp: number, previousHash: Buffer, data: any, difficulty: number) {
+        //     let nonce = 0;
+        //     while (nonce < this.constants.size) {
+        //         let block = new Block(index, timestamp, previousHash, data, difficulty, nonce)
+        //         const hash: Buffer = block.getHash();
+
+        //         // let isMatchDifficulty = await this.hashMatchesDifficulty(hash, difficulty, nonce);
+        //         let isMatchDifficulty = self.hashMatchesDifficulty2(hash, difficulty);
+
+        //         if (isMatchDifficulty) {
+        //             let hashString: string = '';
+
+        //             for (let i = 0; i < 5; i++) {
+        //                 hashString += byte2BinaryString(hash[i]) + ' ';
+        //             }
+        //             let signale = new Signale();
+        //             signale.success('   Hash: ', Buffer.from(hash).toString('hex'));
+        //             signale.debug('   Hash Binary: ', hashString);
+
+        //             return block;
+        //         }
+
+        //         nonce++;
+        //     }
+        // }, {
+        //         constants: { size: 512 },
+        //         output: [512, 512],
+        //     });
+        // const newBlock = pow(nextIndex, timestamp, prevHash, blockData, difficulty);
+        
+        const newBlock: Block = this.PoW(nextIndex, timestamp, prevHash, blockData, difficulty);
 
         if (newBlock) {
-            let isAdded = await this.addBlockToChain(newBlock);
+            let isAdded = this.addBlockToChain(newBlock);
             if (isAdded) {
-                console.log(newBlock.index, newBlock.timestamp, newBlock.difficult);
+                // console.log(newBlock.index, newBlock.timestamp, newBlock.difficult);
+                signale.timeEnd('Mine Block ' + nextIndex + ' in');
+                return newBlock;
             }
-            console.timeEnd('Mine Block ' + blockData + ' in');
-            return newBlock;
         }
     }
 
     private async addBlockToChain(block: Block): Promise<boolean> {
-        let valid = await this.isValidNewBlock(block, this.getLatestBlock());
+        let valid = this.isValidNewBlock(block, this.getLatestBlock());
 
         if (valid) {
             this.blocks.push(block);
@@ -107,8 +170,8 @@ export class Chain {
         }
     }
 
-    private async isValidBlockStructure(block: Block): Promise<boolean> {
-        let hash = await block.getHash();
+    private isValidBlockStructure(block: Block): boolean {
+        let hash = block.getHash();
         return typeof block.index === 'number'
             && typeof block.timestamp === 'number'
             && block.previousHash instanceof Buffer
@@ -116,8 +179,8 @@ export class Chain {
             && (typeof block.data === 'object' || typeof block.data === 'string')
     }
 
-    private async isValidNewBlock(block: Block, prevBlock: Block): Promise<boolean> {
-        let validBlockStructure = await this.isValidBlockStructure(block);
+    private isValidNewBlock(block: Block, prevBlock: Block): boolean {
+        let validBlockStructure = this.isValidBlockStructure(block);
 
         if (!validBlockStructure) {
             return false;
@@ -129,7 +192,7 @@ export class Chain {
             return false;
         }
 
-        let prevBlockHash: Buffer = await prevBlock.getHash();
+        let prevBlockHash: Buffer = prevBlock.getHash();
 
         if (Buffer.compare(prevBlockHash, block.previousHash) !== 0) {
             return false;
@@ -139,13 +202,16 @@ export class Chain {
     }
 
     /**
+     * hashMatchesDifficulty just use for testing purpose.
+     * 
      * The Proof-of-work puzzle is to find a block hash, that has a specific number of zeros prefixing it. 
      * The difficulty property defines how many prefixing zeros the block hash must have , in order for the block to be valid.
      * 
      * @param hash 
      * @param difficult 
+     * @param nonce 
      */
-    public async hashMatchesDifficulty(hash: Buffer, difficult: number, nonce: number): Promise<boolean> {
+    public hashMatchesDifficulty(hash: Buffer, difficult: number, nonce: number): boolean {
         // TODO: Need improve, working with Binary data
         let hashString: string = '';
 
@@ -156,8 +222,9 @@ export class Chain {
         const requiredPrefix: string = '0'.repeat(difficult);
 
         if (hashString.startsWith(requiredPrefix) && difficult < 8) {
-            console.log(Buffer.from(hash).toString('hex'));
-            console.log(hashString);
+            let signale = new Signale();
+            signale.success('   Hash: ', Buffer.from(hash).toString('hex'));
+            signale.debug('   Hash Binary: ', hashString);
         } else if (difficult >= 8) {
             if (hashString.startsWith(requiredPrefix)) {
                 console.log(Buffer.from(hash).toString('hex'));
@@ -205,29 +272,32 @@ export class Chain {
      * @param data 
      * @param difficulty 
      */
-    public async PoW(index: number, timestamp: number, previousHash: Buffer, data: any, difficulty: number): Promise<Block> {
+    public PoW(index: number, timestamp: number, previousHash: Buffer, data: any, difficulty: number): Block {
         let nonce = 0;
         while (true) {
             let block = new Block(index, timestamp, previousHash, data, difficulty, nonce)
-            const hash: Buffer = await block.getHash();
+            const hash: Buffer = block.getHash();
+
             // let isMatchDifficulty = await this.hashMatchesDifficulty(hash, difficulty, nonce);
             let isMatchDifficulty = this.hashMatchesDifficulty2(hash, difficulty);
 
             if (isMatchDifficulty) {
-                console.log(Buffer.from(hash).toString('hex'));
                 let hashString: string = '';
 
-                for (let i = 0; i < 2; i++) {
+                for (let i = 0; i < 5; i++) {
                     hashString += byte2BinaryString(hash[i]) + ' ';
                 }
-                console.log(hashString);
+                let signale = new Signale();
+                signale.success('   Hash: ', Buffer.from(hash).toString('hex'));
+                signale.debug('   Hash Binary: ', hashString);
+
                 return block;
             }
 
             nonce++;
-            if (nonce === 1000) {
-                return null;
-            }
+            // if (nonce === 1000) {
+            //     return null;
+            // }
         }
     }
 
@@ -247,13 +317,17 @@ export class Chain {
         const preAdjustmentBlock = this.blocks[this.blocks.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
 
         const timeTaken: number = latestBlock.timestamp - preAdjustmentBlock.timestamp;
-        console.log('timeTaken to mine 5 blocks: ', timeTaken);
+        const signale = new Signale();
+        signale.note(`   Time Taken to mine ${DIFFICULTY_ADJUSTMENT_INTERVAL} blocks: `, timeTaken, TIME_EXPECTED);
 
         if (timeTaken < TIME_EXPECTED / 2) {
+            signale.info('   Difficulty: ', preAdjustmentBlock.difficult + 1);
             return preAdjustmentBlock.difficult + 1;
         } else if (timeTaken > TIME_EXPECTED * 2) {
+            signale.info('   Difficulty: ', preAdjustmentBlock.difficult - 1);
             return preAdjustmentBlock.difficult - 1;
         } else {
+            signale.info('   Difficulty: ', preAdjustmentBlock.difficult);
             return preAdjustmentBlock.difficult;
         }
     }
@@ -266,11 +340,14 @@ export class Chain {
      */
     public getDifficulty(): number {
         const latestBlock = this.blocks[this.blocks.length - 1];
-        console.log('check difficulty: ', latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL);
+        let signale = new Signale();
+
+        // console.log('check difficulty: ', latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL);
         if (((latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL) === 0) && (latestBlock.index !== 0)) {
-            console.log('Need adjust the Difficulty');
+            signale.note('   Need adjust the Difficulty');
             return this.getAdjustedDifficulty(latestBlock);
         } else {
+            signale.info('   Difficulty: ', latestBlock.difficult);
             return latestBlock.difficult;
         }
     }
@@ -284,9 +361,41 @@ export class Chain {
      * @returns true if valid timestamp 
      */
     public isValidTimestamp(block: Block, prevBlock: Block): boolean {
-        console.log('1. ', prevBlock.timestamp, (prevBlock.timestamp - MINUTES), (prevBlock.timestamp - MINUTES) < block.timestamp);
-        console.log('2. ', block.timestamp, (block.timestamp - MINUTES), (block.timestamp - MINUTES) < getCurrentTimestamp());
-        console.log('3. ', ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp()))
+        // console.log('1. ', prevBlock.timestamp, (prevBlock.timestamp - MINUTES), (prevBlock.timestamp - MINUTES) < block.timestamp);
+        // console.log('2. ', block.timestamp, (block.timestamp - MINUTES), (block.timestamp - MINUTES) < getCurrentTimestamp());
+        // console.log('3. ', ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp()))
         return ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp());
+    }
+
+    private findUnspentTxOut(transactionId: string, index: number, unspendTxOuts: UnspentTxOut[]): UnspentTxOut {
+        return unspendTxOuts.find((uTxO) => uTxO.txOutId == transactionId && uTxO.txOutIndex == index);
+    }
+
+    private updateUnspentTxOuts(trans: Transaction[], unspendTxOuts: UnspentTxOut[]): UnspentTxOut[] {
+        const newUnspendTxOuts: UnspentTxOut[] = trans
+            .map((T) => {
+                return T.txOuts.map((txOut, index) => new UnspentTxOut(T.id, index, txOut.publicKey, txOut.amount));
+            })
+            .reduce((a, b) => a.concat(b));
+
+        const consumedTxOuts: UnspentTxOut[] = trans
+            .map((T) => {
+                return T.txIns;
+            })
+            .reduce((a, b) => a.concat(b))
+            .map((txIn) => new UnspentTxOut(txIn.txId, txIn.txOutIndex, '', 0));
+
+        const resultingUnspendTxOuts = unspendTxOuts
+            .filter((uTxO) => {
+                return !this.findUnspentTxOut(uTxO.txOutId, uTxO.txOutIndex, consumedTxOuts);
+            })
+            .concat(newUnspendTxOuts);
+
+        return resultingUnspendTxOuts;
+    }
+
+    public processTransactions(trans: Transaction[], unspendTxOuts: UnspentTxOut[], blockIndex: number): UnspentTxOut[] {
+
+        return this.updateUnspentTxOuts(trans, unspendTxOuts);
     }
 }
