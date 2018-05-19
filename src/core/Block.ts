@@ -15,7 +15,8 @@
  */
 
 import * as Crypto from 'crypto';
-import { hasMagic } from 'glob';
+import { byte2BinaryString, getCurrentTimestamp } from './Utils';
+import { Transaction } from './Transaction';
 
 /**
  * A Block hold all Block information
@@ -23,10 +24,10 @@ import { hasMagic } from 'glob';
 export class Block {
     public index: number;
     public timestamp: number;
-    public previousHash: Uint8Array;
+    public previousHash: Buffer;
     public data: any;
 
-    private _hash: Uint8Array;
+    private _hash: Buffer;
     public difficult: number;
     public _nonce: number;
 
@@ -40,9 +41,9 @@ export class Block {
      * @param difficult 
      * @param nonce 
      */
-    constructor(index: number, timestamp: number, previousHash: Uint8Array, data: any, difficult: number, nonce: number) {
+    constructor(index: number, timestamp: number, previousHash: Buffer, data: any, difficult: number, nonce: number) {
         this.index = index;
-        this.timestamp = timestamp;
+        this.timestamp = getCurrentTimestamp();
         this.previousHash = previousHash;
         this.data = data;
 
@@ -50,11 +51,15 @@ export class Block {
         this._nonce = nonce;
     }
 
+    // constructor(index: number, previousHash: Buffer, transactions: Transaction[]) {
+    //     this.index = index;
+    //     this.timestamp = getCurrentTimestamp();
+    //     this.previousHash = previousHash;
+    //     this.data = transactions;
+    // }
 
-
-    private async calculateHash(): Promise<Uint8Array> {
+    private calculateHash(): Buffer {
         let self = this;
-
         let str = '';
         for (let attr in self) {
             if (attr != '_hash') {
@@ -62,7 +67,7 @@ export class Block {
             }
         }
 
-        const hash = await
+        const hash =
             Crypto.createHash('SHA256')
                 .update(str)
                 .digest();
@@ -70,16 +75,16 @@ export class Block {
         return hash;
     }
 
-    public async getHash(): Promise<Uint8Array> {
+    public getHash(): Buffer {
         if (this._hash !== null) {
-            this._hash = await this.calculateHash();
+            this._hash = this.calculateHash();
         }
 
         return this._hash;
     }
 
-    public async getHashAsString(): Promise<string> {
-        const hash = await this.getHash();
+    public getHashAsString(): string {
+        const hash = this.getHash();
         return Buffer.from(hash).toString('hex');
     }
 

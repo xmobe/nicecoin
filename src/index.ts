@@ -1,4 +1,4 @@
-import * as sqlite3 from 'sqlite3';
+/*import * as sqlite3 from 'sqlite3';
 
 var db = new sqlite3.Database('./data/test.db', (err) => {
     if (err) {
@@ -14,3 +14,28 @@ db.each("SELECT * FROM Category", (err, row) => {
 });
 
 db.close();
+*/
+
+import * as faker from 'faker';
+import { Block, Chain } from './core';
+
+Chain
+    .getInstance()
+    .then(instance => {
+        let chain = instance;
+        let genesisBlock: Block = chain.getCurrentBlock();
+
+        // chain.mine(faker.company.companyName());
+        let i = 0;
+
+        let handler = setInterval(() => {
+            let data = faker.company.companyName();
+            // console.log('Block Data: ', data);
+            chain.mine(data)
+        
+            i++;
+            if (i == 10) {
+                clearInterval(handler);
+            }
+        }, 5000); // time to mine block not right
+    });
