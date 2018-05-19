@@ -79,7 +79,7 @@ export class Chain {
             'publicKey': '044b9214fa338400bd599b2cb53acb78e4dae85e44163240cae0d11b371af7feabe90df572eb8df71a29e0a840c104d3a40782547c6b7c307348683bb5cd6029ad',
             'amount': 500
         }];
-        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 15, 0);
+        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 24, 0);
 
         let hash = await genesisBlock.getHashAsString();
 

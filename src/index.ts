@@ -34,7 +34,7 @@ Chain
             chain.mine(data)
         
             i++;
-            if (i == 50) {
+            if (i == 10) {
                 clearInterval(handler);
             }
         }, 5000); // time to mine block not right
