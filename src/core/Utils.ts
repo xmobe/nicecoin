@@ -1,3 +1,31 @@
+/**
+ * Copyright 2018 xMobe https://www.xmobe.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+/**
+ * hexToBinary 
+ * Convert hex string to binary string, using for visually testing purpose 
+ * @param s
+ */
 export const hexToBinary = (s: string): string => {
     let ret: string = '';
     const lookupTable = {
@@ -20,10 +48,20 @@ export const hexToBinary = (s: string): string => {
     return ret;
 };
 
+/**
+ * byte2BinaryString 
+ * Convert byte to binary string, using for visually testing purpose
+ * 
+ * @param n 
+ */
 export const byte2BinaryString = (n): string => {
     return (('000000000' + n.toString(2)).substr(-8));
 }
 
+/**
+ * getCurrentTimestamp 
+ * Return the Local Current Time in second
+ */
 export const getCurrentTimestamp = (): number => {
     return ((new Date()).getTime() / 1000);
 }
