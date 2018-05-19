@@ -5,4 +5,4 @@ dist/
 dist-test/
 data/
 templates/
-wallet/private_key
+./wallet
