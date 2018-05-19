@@ -76,7 +76,7 @@ export class Chain {
         genesisTransaction.id = 'd9c152298c90efeb1628e7a79dc7405485a37c6de8b384ed0077c0ae105f924b';
         genesisTransaction.txIns = [{ 'signature': '', 'txId': '', 'txOutIndex': 0 }];
         genesisTransaction.txOuts = [{
-            'publicKey': '044b9214fa338400bd599b2cb53acb78e4dae85e44163240cae0d11b371af7feabe90df572eb8df71a29e0a840c104d3a40782547c6b7c307348683bb5cd6029ad',
+            'publicKey': '04995fe4c631d2de37e55c825c1f6cdcffd91106e103604552294b79b3418b72a49bb341602c8fc5699b76f6b68e75feca9188c55a2045776c490f188ea0dcfcb1',
             'amount': 500
         }];
         let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 24, 0);

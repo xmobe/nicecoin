@@ -64,7 +64,7 @@ describe('Block', () => {
         }
 
         let str2 = '';
-        let buffer = Buffer.from(hash)
+        // let buffer = Buffer.from(hash)
         console.log(str);
         console.log(hexToBinary(str1));
 

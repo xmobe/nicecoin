@@ -73,8 +73,6 @@ export class Wallet {
             .forEach(amount => {
                 sum += amount;
             })
-        
-            console.log('test');
         return sum;
     }
 }
