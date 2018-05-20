@@ -1,17 +1,24 @@
 /**
- * Copyright 2018 xMobe
+ * Copyright 2018 xMobe https://www.xmobe.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
 var GPU = require('gpu.js');
@@ -76,12 +83,12 @@ export class Chain {
         genesisTransaction.id = 'd9c152298c90efeb1628e7a79dc7405485a37c6de8b384ed0077c0ae105f924b';
         genesisTransaction.txIns = [{ 'signature': '', 'txId': '', 'txOutIndex': 0 }];
         genesisTransaction.txOuts = [{
-            'publicKey': '044b9214fa338400bd599b2cb53acb78e4dae85e44163240cae0d11b371af7feabe90df572eb8df71a29e0a840c104d3a40782547c6b7c307348683bb5cd6029ad',
+            'publicKey': '04210b494b3ae21490abef3e88128e1fd04a1c9ff4aefe177e6f2a33369e6191eddd011004539589ba867bb7353e3d751b6110501d73ac20fd462149dfae914848',
             'amount': 500
         }];
-        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 24, 0);
+        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 14, 0);
 
-        let hash = await genesisBlock.getHashAsString();
+        let hash = genesisBlock.getHashAsString();
 
         console.log('Anything Human can understand!!!');
         console.log('Genesis hash: ', hash);

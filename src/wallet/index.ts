@@ -21,12 +21,4 @@
  *
  */
 
-export class TxOut {
-    public publicKey: string;
-    public amount: number;
-
-    constructor(publicKey: string, amount: number) {
-        this.publicKey = publicKey;
-        this.amount = amount;
-    }
-}
+export { Wallet } from './Wallet';

@@ -21,12 +21,12 @@
  *
  */
 
-export class TxOut {
-    public publicKey: string;
-    public amount: number;
+import { expect } from 'chai';
+import { TxPool } from '../../src/core';
 
-    constructor(publicKey: string, amount: number) {
-        this.publicKey = publicKey;
-        this.amount = amount;
-    }
-}
+describe('Transaction Pool', () => {
+    it('Should return a Valid Address', () => {
+        let txPool = new TxPool();
+        expect(txPool.isValidAddress('04210b494b3ae21490abef3e88128e1fd04a1c9ff4aefe177e6f2a33369e6191eddd011004539589ba867bb7353e3d751b6110501d73ac20fd462149dfae914848')).to.equal(true);
+    });
+});
