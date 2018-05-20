@@ -13,6 +13,7 @@
     "coveralls": "nyc report --reporter=lcov",
     "lint": "eslint src --ext ts",
     "docs": "typedoc --out ./docs ./src/**/*.ts --mode modules --theme minimal",
+    "diagram": "tsviz -r ./src/ ./diagram/diagram.png && tsviz -r ./src/core/ ./diagram/core.png && tsviz -r ./src/wallet/ ./diagram/wallet.png",
     "tsc": "tsc"
   },
   "repository": {

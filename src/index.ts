@@ -58,9 +58,9 @@ Chain
             // console.log('Block Data: ', data);
             chain.mine(data)
         
-            i++;
-            if (i == 10) {
-                clearInterval(handler);
-            }
+            // i++;
+            // if (i == 10) {
+            //     clearInterval(handler);
+            // }
         }, 5000); // time to mine block not right
     });
