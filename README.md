@@ -16,3 +16,4 @@
 
 Nicecoin is my personal project to learning about BitCoin and BitCoinJ. 
 
+![Overview Diagram](https://github.com/xmobe-com/nicecoin/blob/feature/core/diagram/diagram.png)
