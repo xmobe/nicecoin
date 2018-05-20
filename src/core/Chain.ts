@@ -86,9 +86,9 @@ export class Chain {
             'publicKey': '04210b494b3ae21490abef3e88128e1fd04a1c9ff4aefe177e6f2a33369e6191eddd011004539589ba867bb7353e3d751b6110501d73ac20fd462149dfae914848',
             'amount': 500
         }];
-        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 24, 0);
+        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 14, 0);
 
-        let hash = await genesisBlock.getHashAsString();
+        let hash = genesisBlock.getHashAsString();
 
         console.log('Anything Human can understand!!!');
         console.log('Genesis hash: ', hash);

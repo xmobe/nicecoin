@@ -27,3 +27,4 @@ export { Transaction } from './Transaction';
 export { TxIn } from './TransactionIn';
 export { TxOut } from './TransactionOut';
 export { UnspentTxOut } from './UTXO';
+export { TxPool } from './TransactionPool'

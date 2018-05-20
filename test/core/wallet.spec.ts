@@ -26,7 +26,7 @@ import { Chain } from '../../src/core';
 import { Wallet } from '../../src/wallet';
 import * as faker from 'faker';
 
-describe('BlockChain', () => {
+describe('Wallet', () => {
     let wallet: Wallet;
     let public_key: string;
     let private_key: string;
