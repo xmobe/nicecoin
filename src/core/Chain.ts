@@ -21,8 +21,8 @@
  *
  */
 
-var GPU = require('gpu.js');
-
+// var GPU = require('gpu.js');
+import { GPU } from 'gpu.js';
 import * as Crypto from 'crypto';
 import { Block } from './Block';
 import { Transaction } from './Transaction';
@@ -153,7 +153,7 @@ export class Chain {
         //         output: [512, 512],
         //     });
         // const newBlock = pow(nextIndex, timestamp, prevHash, blockData, difficulty);
-        
+
         const newBlock: Block = this.PoW(nextIndex, timestamp, prevHash, blockData, difficulty);
 
         if (newBlock) {

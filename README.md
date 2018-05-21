@@ -20,3 +20,7 @@
 Nicecoin is my personal project to learning about BitCoin and BitCoinJ. 
 
 ![Overview Diagram](https://github.com/xmobe-com/nicecoin/blob/feature/core/diagram/diagram.png)
+
+Old Test Mocha
+"pre-test": "rm -Rf dist-test && tsc -p tsconfig.test.json",
+"test": "npm run pre-test && nyc --reporter=html --reporter=text mocha ./dist-test/**/**/*.spec.js -R spec",
