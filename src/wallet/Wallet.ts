@@ -36,15 +36,24 @@ export class Wallet {
         this.path = path;
 
         this.EC = new EC('secp256k1');
-        if (!existsSync(path)) {
+        if (!existsSync(`${this.path}/${privateKeyFile}`)) {
             const newPrivateKey = this.generatePrivatekey();
-
-            if (!existsSync(this.path)) {
-                mkdirSync(this.path, 484);
-            }
-            writeFileSync(`${this.path}/${privateKeyFile}`, newPrivateKey);
             const signale = new Signale();
-            signale.success('new wallet with private key created to: ', `${this.path}/${privateKeyFile}`);
+            if (!existsSync(this.path)) {
+                signale.info('here');
+                try {
+                    mkdirSync(this.path, 484);
+                } catch (error) {
+                    signale.error(error);
+                }
+            }
+
+            try {
+                writeFileSync(`./${this.path}/${privateKeyFile}`, newPrivateKey, {mode: 0o666, flag: 'wx'});
+                signale.success('new wallet with private key created to: ', `${this.path}/${privateKeyFile}`);
+            } catch (error) {
+                signale.error(error);
+            }
         }
     }
 

@@ -341,7 +341,7 @@ export class Chain {
         genesisTransaction.txOuts = [{
             amount: 500,
             /* tslint:disable */
-            publicKey: '04fb8415f6cc2734b5339708b580496a055ff10c90ebdbb38f5907cafaea38628664541ebc6d46f35ee207f3124947dd33fc8e9e622f65f28fdff95c9031c65cf9',
+            publicKey: '04de259ad2577e88a5268260950ddbee638f141831ddb351e047c2e5d7823218d648171258e06ff315cb3dc4ed540bca619315c4794d5b727c918cd2739fcea645',
             /* tslint:enable */
         }];
         const genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 14, 0);

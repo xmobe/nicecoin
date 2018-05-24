@@ -30,12 +30,20 @@ describe('Wallet', () => {
     let wallet: Wallet;
     let publicKey: string;
     let privateKey: string;
+    let amount: number;
 
     beforeEach(() => {
         wallet = new Wallet('wallet1');
 
         publicKey = wallet.getPublicFromWallet();
         privateKey = wallet.getPrivateFromWallet();
+        Chain
+            .getInstance()
+            .then((instance: Chain) => {
+                const chain = instance;
+
+                amount = wallet.getBalance(publicKey, chain.getUnspentTxOuts());
+            });
 
         const signale = new Signale();
         signale.debug('Public Key is: ', publicKey);
@@ -47,7 +55,7 @@ describe('Wallet', () => {
         expect(w.getPrivateFromWallet()).to.equal(privateKey);
     });
 
-    it(`Should return Wallet amount`, () => {
+    it(`Should return Wallet amount is ${amount}`, () => {
         Chain
             .getInstance()
             .then((instance: Chain) => {
@@ -55,14 +63,8 @@ describe('Wallet', () => {
                 const genesisBlock = chain.getCurrentBlock();
 
                 const w = new Wallet('wallet1');
-                const amount: number = w.getBalance(publicKey, chain.getUnspentTxOuts());
-                /* tslint:disable */
-                if (publicKey == `04fb8415f6cc2734b5339708b580496a055ff10c90ebdbb38f5907cafaea38628664541ebc6d46f35ee207f3124947dd33fc8e9e622f65f28fdff95c9031c65cf9`) {
-                    /* tslint:enable */
-                    expect(amount).to.equal(500);
-                } else {
-                    expect(amount).to.equal(0);
-                }
+                const wamount: number = w.getBalance(publicKey, chain.getUnspentTxOuts());
+                expect(amount).to.equal(wamount);
             });
     });
 });

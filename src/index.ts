@@ -51,7 +51,8 @@ Chain
         const chain = instance;
         const genesisBlock: Block = chain.getCurrentBlock();
 
-        const wallet = new Wallet('wallet1');
+        const wallet = new Wallet('wallet');
+        wallet.getPublicFromWallet();
 
         let i = 0;
         const handler = setInterval(() => {
