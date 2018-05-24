@@ -7,6 +7,7 @@ data/
 templates/
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ./wallet/
 ./wallet/private_key
 =======
@@ -15,3 +16,6 @@ templates/
 =======
 wallet/private_key
 >>>>>>> 5775e53... update wallet
+=======
+./wallet
+>>>>>>> ecabe54... update wallet
