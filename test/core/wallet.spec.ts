@@ -1,38 +1,64 @@
+/**
+ * Copyright 2018 xMobe https://www.xmobe.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the `Software`), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED `AS IS`, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
 import { expect } from 'chai';
+import { Signale } from 'signale';
 import { Chain } from '../../src/core';
 import { Wallet } from '../../src/wallet';
-import * as faker from 'faker';
 
-describe('BlockChain', () => {
+describe('Wallet', () => {
     let wallet: Wallet;
-    let public_key: string;
-    let private_key: string;
+    let publicKey: string;
+    let privateKey: string;
 
     beforeEach(() => {
-        wallet = new Wallet();
+        wallet = new Wallet('wallet1');
 
-        public_key = wallet.getPublicFromWallet();
-        private_key = wallet.getPrivateFromWallet();
+        publicKey = wallet.getPublicFromWallet();
+        privateKey = wallet.getPrivateFromWallet();
 
-        console.log('Public Key is: ', public_key);
-        console.log('Private Key is: ', private_key);
+        const signale = new Signale();
+        signale.debug('Public Key is: ', publicKey);
+        signale.debug('Private Key is: ', privateKey);
     });
 
-    it("Should create Wallet with a Private Key", () => {
-        let w = new Wallet();
-        expect(w.getPrivateFromWallet()).to.equal(private_key);
+    it(`Should create Wallet with a Private Key`, () => {
+        const w = new Wallet('wallet1');
+        expect(w.getPrivateFromWallet()).to.equal(privateKey);
     });
 
-    it("Should return Wallet amount 500", () => {
+    it(`Should return Wallet amount`, () => {
         Chain
             .getInstance()
-            .then(instance => {
-                let chain = instance;
-                let genesisBlock = chain.getCurrentBlock();
+            .then((instance: Chain) => {
+                const chain = instance;
+                const genesisBlock = chain.getCurrentBlock();
 
-                let w = new Wallet();
-                let amount: number = w.getBalance(public_key, chain.getUnspentTxOuts());
-                if (public_key == '04995fe4c631d2de37e55c825c1f6cdcffd91106e103604552294b79b3418b72a49bb341602c8fc5699b76f6b68e75feca9188c55a2045776c490f188ea0dcfcb1') {
+                const w = new Wallet('wallet1');
+                const amount: number = w.getBalance(publicKey, chain.getUnspentTxOuts());
+                /* tslint:disable */
+                if (publicKey == `04fb8415f6cc2734b5339708b580496a055ff10c90ebdbb38f5907cafaea38628664541ebc6d46f35ee207f3124947dd33fc8e9e622f65f28fdff95c9031c65cf9`) {
+                    /* tslint:enable */
                     expect(amount).to.equal(500);
                 } else {
                     expect(amount).to.equal(0);

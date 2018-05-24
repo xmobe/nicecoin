@@ -5,5 +5,9 @@ dist/
 dist-test/
 data/
 templates/
+<<<<<<< HEAD
 ./wallet/
 ./wallet/private_key
+=======
+./wallet
+>>>>>>> 6eadb95... Implement Core

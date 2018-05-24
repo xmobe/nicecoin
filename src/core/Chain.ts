@@ -1,32 +1,37 @@
-/**
- * Copyright 2018 xMobe
+/*
+ * The MIT License (MIT)
+ * Copyright (c) 2018 xMobe https://www.xmobe.com
+ * Author: Arkay Lee <quanganh@aiti.com.vn>
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-var GPU = require('gpu.js');
-
+// var GPU = require('gpu.js');
 import * as Crypto from 'crypto';
+import { GPU } from 'gpu.js';
+import { Signale } from 'signale';
 import { Block } from './Block';
 import { Transaction } from './Transaction';
-import { UnspentTxOut } from './UTXO';
+import { TxIn } from './TransactionIn';
 import { byte2BinaryString, getCurrentTimestamp } from './Utils';
+import { UnspentTxOut } from './UTXO';
 
-import { Signale } from 'signale';
-
-// in seconds 
+// in seconds
 const BLOCK_GENERATION_INTERVAL: number = 10;
-// in blocks 
+// in blocks
 const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10;
 const TIME_EXPECTED: number = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
 const MINUTES: number = 60;
@@ -36,11 +41,20 @@ const COINBASE_AMOUNT: number = 50;
  * Chain
  */
 export class Chain {
+    public static async getInstance(): Promise<Chain> {
+        if (!Chain.instance) {
+            Chain.instance = new Chain();
+            await Chain.instance.createGenesisBlock();
+        }
+
+        return Chain.instance;
+    }
+
     private static instance: Chain = null;
 
     private blocks: Block[];
     private currentBlock: Block = null;
-    private unspentTxOuts: UnspentTxOut[]
+    private unspentTxOuts: UnspentTxOut[];
 
     /**
      * Creates an instance of chain.
@@ -49,47 +63,6 @@ export class Chain {
     private constructor() {
         this.blocks = new Array<Block>();
         this.unspentTxOuts = new Array<UnspentTxOut>();
-    }
-
-    static async getInstance(): Promise<Chain> {
-        if (!Chain.instance) {
-            Chain.instance = new Chain();
-            await Chain.instance.createGenesisBlock();
-        }
-        return Chain.instance;
-    }
-
-    private async createGenesisBlock() {
-        // explicit set a date 
-        let now = new Date();
-        now.setDate(20);
-        now.setMonth(5);
-        now.setFullYear(2017);
-        now.setHours(10);
-        now.setMinutes(9);
-        now.setSeconds(0);
-
-        // No transaction area
-        // let genesisBlock = new Block(0, (now.getTime() / 1000), null, 'NiceCoin Genesis Block', 14, 0);
-
-        const genesisTransaction: Transaction = new Transaction();
-        genesisTransaction.id = 'd9c152298c90efeb1628e7a79dc7405485a37c6de8b384ed0077c0ae105f924b';
-        genesisTransaction.txIns = [{ 'signature': '', 'txId': '', 'txOutIndex': 0 }];
-        genesisTransaction.txOuts = [{
-            'publicKey': '04995fe4c631d2de37e55c825c1f6cdcffd91106e103604552294b79b3418b72a49bb341602c8fc5699b76f6b68e75feca9188c55a2045776c490f188ea0dcfcb1',
-            'amount': 500
-        }];
-        let genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 24, 0);
-
-        let hash = await genesisBlock.getHashAsString();
-
-        console.log('Anything Human can understand!!!');
-        console.log('Genesis hash: ', hash);
-
-        this.blocks.push(genesisBlock);
-        this.currentBlock = genesisBlock;
-
-        this.unspentTxOuts = this.processTransactions(this.blocks[0].data, [], 0);
     }
 
     public getUnspentTxOuts() {
@@ -105,19 +78,22 @@ export class Chain {
     }
 
     public mine(blockData: any): Block {
-        let signale = new Signale();
+        const signale = new Signale();
         const prevBlock: Block = this.getLatestBlock();
         const nextIndex: number = prevBlock.index + 1;
 
-        signale.time('Mine Block ' + nextIndex + ' in');
+        signale.time(`Mine Block ${nextIndex} in`);
         const difficulty: number = this.getDifficulty();
 
         const timestamp: number = getCurrentTimestamp();
         const prevHash = prevBlock.getHash();
 
+        // using GPU libs
         // const gpu = new GPU({ model: 'cpu' });
         // const self = this;
+        /* tslint:disable */
         // const pow = gpu.createKernel(function (index: number, timestamp: number, previousHash: Buffer, data: any, difficulty: number) {
+        /* tslint:enable */
         //     let nonce = 0;
         //     while (nonce < this.constants.size) {
         //         let block = new Block(index, timestamp, previousHash, data, difficulty, nonce)
@@ -146,92 +122,50 @@ export class Chain {
         //         output: [512, 512],
         //     });
         // const newBlock = pow(nextIndex, timestamp, prevHash, blockData, difficulty);
-        
+
         const newBlock: Block = this.PoW(nextIndex, timestamp, prevHash, blockData, difficulty);
 
         if (newBlock) {
-            let isAdded = this.addBlockToChain(newBlock);
+            const isAdded = this.addBlockToChain(newBlock);
             if (isAdded) {
-                // console.log(newBlock.index, newBlock.timestamp, newBlock.difficult);
-                signale.timeEnd('Mine Block ' + nextIndex + ' in');
+                signale.timeEnd(`Mine Block ${nextIndex} in`);
+
                 return newBlock;
             }
         }
     }
 
-    private async addBlockToChain(block: Block): Promise<boolean> {
-        let valid = this.isValidNewBlock(block, this.getLatestBlock());
-
-        if (valid) {
-            this.blocks.push(block);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private isValidBlockStructure(block: Block): boolean {
-        let hash = block.getHash();
-        return typeof block.index === 'number'
-            && typeof block.timestamp === 'number'
-            && block.previousHash instanceof Buffer
-            && hash instanceof Buffer
-            && (typeof block.data === 'object' || typeof block.data === 'string')
-    }
-
-    private isValidNewBlock(block: Block, prevBlock: Block): boolean {
-        let validBlockStructure = this.isValidBlockStructure(block);
-
-        if (!validBlockStructure) {
-            return false;
-        }
-
-        if ((prevBlock.index + 1) !== block.index) {
-            return false;
-        } else if (!this.isValidTimestamp(block, prevBlock)) {
-            return false;
-        }
-
-        let prevBlockHash: Buffer = prevBlock.getHash();
-
-        if (Buffer.compare(prevBlockHash, block.previousHash) !== 0) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * hashMatchesDifficulty just use for testing purpose.
-     * 
-     * The Proof-of-work puzzle is to find a block hash, that has a specific number of zeros prefixing it. 
-     * The difficulty property defines how many prefixing zeros the block hash must have , in order for the block to be valid.
-     * 
-     * @param hash 
-     * @param difficult 
-     * @param nonce 
+     *
+     * The Proof-of-work puzzle is to find a block hash, that has a specific number of zeros prefixing it.
+     * The difficulty property defines how many prefixing zeros the block hash must have , in order for
+     * the block to be valid.
+     *
+     * @param hash
+     * @param difficult
+     * @param nonce
      */
     public hashMatchesDifficulty(hash: Buffer, difficult: number, nonce: number): boolean {
         // TODO: Need improve, working with Binary data
         let hashString: string = '';
 
-        for (let i = 0; i < hash.length; i++) {
-            hashString += byte2BinaryString(hash[i]) + ' ';
+        for (const i of hash) {
+            hashString += `${byte2BinaryString(hash[i])} `;
         }
 
         const requiredPrefix: string = '0'.repeat(difficult);
-
+        const signale = new Signale();
         if (hashString.startsWith(requiredPrefix) && difficult < 8) {
-            let signale = new Signale();
             signale.success('   Hash: ', Buffer.from(hash).toString('hex'));
             signale.debug('   Hash Binary: ', hashString);
         } else if (difficult >= 8) {
             if (hashString.startsWith(requiredPrefix)) {
-                console.log(Buffer.from(hash).toString('hex'));
+                signale.log(Buffer.from(hash).toString('hex'));
             }
-            let check = (nonce % 1000);
+            const check = (nonce % 1000);
             if (check === 0) {
-                console.log(hashString);
+                signale.log(hashString);
             }
         }
 
@@ -239,15 +173,16 @@ export class Chain {
     }
 
     /**
-     * hashMatchesDifficulty2 working with Buffer Binary data, 
-     * The Proof-of-work puzzle is to find a block hash, that has a specific number of zeros prefixing it. 
-     * The difficulty property defines how many prefixing zeros the block hash must have , in order for the block to be valid.
-     * 
-     * @param hash 
-     * @param difficult 
+     * hashMatchesDifficulty2 working with Buffer Binary data,
+     * The Proof-of-work puzzle is to find a block hash, that has a specific number of zeros prefixing it.
+     * The difficulty property defines how many prefixing zeros the block hash must have , in order for the
+     * block to be valid.
+     *
+     * @param hash
+     * @param difficult
      */
     public hashMatchesDifficulty2(hash: Buffer, difficult: number): boolean {
-        for (var i = 0; i < difficult; i++) {
+        for (let i = 0; i < difficult; i++) {
             const byte = ~~(i / 8);
             const bit = i % 8;
             const hashByte = hash[byte];
@@ -255,39 +190,41 @@ export class Chain {
             if (hashByte & Math.pow(2, (7 - bit))) {
                 return false;
             }
-        };
+        }
+
         return true;
     }
 
     /**
-     * In order to find a hash that satisfies the difficulty, we must be able to calculate different hashes 
-     * for the same content of the block. This is done by modifying the nonce parameter. 
-     * Because SHA256 is a hash function, each time anything in the block changes, the hash will be completely different. 
-     * 
+     * In order to find a hash that satisfies the difficulty, we must be able to calculate different hashes
+     * for the same content of the block. This is done by modifying the nonce parameter.
+     * Because SHA256 is a hash function, each time anything in the block changes, the hash will be completely
+     * different.
+     *
      * “Mining” is basically just trying a different nonce until the block hash matches the difficulty.
-     * 
-     * @param index 
-     * @param timestamp 
-     * @param previousHash 
-     * @param data 
-     * @param difficulty 
+     *
+     * @param index
+     * @param timestamp
+     * @param previousHash
+     * @param data
+     * @param difficulty
      */
     public PoW(index: number, timestamp: number, previousHash: Buffer, data: any, difficulty: number): Block {
         let nonce = 0;
         while (true) {
-            let block = new Block(index, timestamp, previousHash, data, difficulty, nonce)
+            const block = new Block(index, timestamp, previousHash, data, difficulty, nonce);
             const hash: Buffer = block.getHash();
 
             // let isMatchDifficulty = await this.hashMatchesDifficulty(hash, difficulty, nonce);
-            let isMatchDifficulty = this.hashMatchesDifficulty2(hash, difficulty);
+            const isMatchDifficulty = this.hashMatchesDifficulty2(hash, difficulty);
 
             if (isMatchDifficulty) {
                 let hashString: string = '';
 
                 for (let i = 0; i < 5; i++) {
-                    hashString += byte2BinaryString(hash[i]) + ' ';
+                    hashString += `${byte2BinaryString(hash[i])} `;
                 }
-                let signale = new Signale();
+                const signale = new Signale();
                 signale.success('   Hash: ', Buffer.from(hash).toString('hex'));
                 signale.debug('   Hash Binary: ', hashString);
 
@@ -303,15 +240,17 @@ export class Chain {
 
     /**
      * Gets adjusted difficulty
-     * The expected time represents the case where the hashrate matches exactly the current difficulty. 
-     * We either increase or decrease the difficulty by one if the time taken is at least two times greater or smaller than the expected difficulty.
-     * 
-     * To calculate the difficulty for the next Ethereum block, you calculate the time it took to mine the previous block, 
-     * and if that time difference was greater than the goal time, then the difficulty goes down to make mining the next 
-     * block quicker. If it was less than the time goal, then difficulty goes up to attempt to mine the next block quicker.
-     * 
-     * @param latestBlock 
-     * @returns 
+     * The expected time represents the case where the hashrate matches exactly the current difficulty.
+     * We either increase or decrease the difficulty by one if the time taken is at least two times greater
+     * or smaller than the expected difficulty.
+     *
+     * To calculate the difficulty for the next Ethereum block, you calculate the time it took to mine the
+     * previous block, and if that time difference was greater than the goal time, then the difficulty goes
+     * down to make mining the next block quicker. If it was less than the time goal, then difficulty goes
+     * up to attempt to mine the next block quicker.
+     *
+     * @param latestBlock
+     * @returns
      */
     public getAdjustedDifficulty(latestBlock: Block) {
         const preAdjustmentBlock = this.blocks[this.blocks.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
@@ -322,80 +261,166 @@ export class Chain {
 
         if (timeTaken < TIME_EXPECTED / 2) {
             signale.info('   Difficulty: ', preAdjustmentBlock.difficult + 1);
+
             return preAdjustmentBlock.difficult + 1;
         } else if (timeTaken > TIME_EXPECTED * 2) {
             signale.info('   Difficulty: ', preAdjustmentBlock.difficult - 1);
+
             return preAdjustmentBlock.difficult - 1;
         } else {
             signale.info('   Difficulty: ', preAdjustmentBlock.difficult);
+
             return preAdjustmentBlock.difficult;
         }
     }
 
     /**
      * Gets difficulty
-     * For every 10 blocks that is generated, we check if the time that took to generate those blocks are larger or smaller than the expected time.
-     * 
-     * @returns difficulty 
+     * For every 10 blocks that is generated, we check if the time that took to generate those blocks are larger
+     * or smaller than the expected time.
+     *
+     * @returns difficulty
      */
     public getDifficulty(): number {
         const latestBlock = this.blocks[this.blocks.length - 1];
-        let signale = new Signale();
+        const signale = new Signale();
 
-        // console.log('check difficulty: ', latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL);
+        // signale.log('check difficulty: ', latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL);
         if (((latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL) === 0) && (latestBlock.index !== 0)) {
             signale.note('   Need adjust the Difficulty');
+
             return this.getAdjustedDifficulty(latestBlock);
         } else {
             signale.info('   Difficulty: ', latestBlock.difficult);
+
             return latestBlock.difficult;
         }
     }
 
     /**
      * Determines whether valid timestamp is
-     * - A block is valid, if the timestamp is at most 1 min in the future from the time we perceive. 
+     * - A block is valid, if the timestamp is at most 1 min in the future from the time we perceive.
      * - A block in the chain is valid, if the timestamp is at most 1 min in the past of the previous block.
-     * @param block 
-     * @param prevBlock 
-     * @returns true if valid timestamp 
+     * @param block
+     * @param prevBlock
+     * @returns true if valid timestamp
      */
     public isValidTimestamp(block: Block, prevBlock: Block): boolean {
-        // console.log('1. ', prevBlock.timestamp, (prevBlock.timestamp - MINUTES), (prevBlock.timestamp - MINUTES) < block.timestamp);
-        // console.log('2. ', block.timestamp, (block.timestamp - MINUTES), (block.timestamp - MINUTES) < getCurrentTimestamp());
-        // console.log('3. ', ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp()))
-        return ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp());
+        // const signale = new Signale();
+        /* tslint:disable */
+        // signale.log('1. ', prevBlock.timestamp, (prevBlock.timestamp - MINUTES), (prevBlock.timestamp - MINUTES) < block.timestamp);
+        // signale.log('2. ', block.timestamp, (block.timestamp - MINUTES), (block.timestamp - MINUTES) < getCurrentTimestamp());
+        // signale.log('3. ', ((prevBlock.timestamp - MINUTES) < block.timestamp) && ((block.timestamp - MINUTES) < getCurrentTimestamp()))
+        /* tslint:enable */
+        return ((prevBlock.timestamp - MINUTES) < block.timestamp)
+            && ((block.timestamp - MINUTES) < getCurrentTimestamp());
+    }
+
+    public processTransactions(trans: Transaction[],
+        unspendTxOuts: UnspentTxOut[],
+        blockIndex: number): UnspentTxOut[] {
+
+        return this.updateUnspentTxOuts(trans, unspendTxOuts);
+    }
+
+    private async createGenesisBlock() {
+        // explicit set a date
+        const now = new Date();
+        now.setDate(20);
+        now.setMonth(5);
+        now.setFullYear(2017);
+        now.setHours(10);
+        now.setMinutes(9);
+        now.setSeconds(0);
+
+        // No transaction area
+        // let genesisBlock = new Block(0, (now.getTime() / 1000), null, 'NiceCoin Genesis Block', 14, 0);
+        const genesisTransaction: Transaction = new Transaction();
+        genesisTransaction.id = 'd9c152298c90efeb1628e7a79dc7405485a37c6de8b384ed0077c0ae105f924b';
+        genesisTransaction.txIns = [{ signature: '', txId: '', txOutIndex: 0 }];
+        genesisTransaction.txOuts = [{
+            amount: 500,
+            /* tslint:disable */
+            publicKey: '04fb8415f6cc2734b5339708b580496a055ff10c90ebdbb38f5907cafaea38628664541ebc6d46f35ee207f3124947dd33fc8e9e622f65f28fdff95c9031c65cf9',
+            /* tslint:enable */
+        }];
+        const genesisBlock = new Block(0, (now.getTime() / 1000), null, [genesisTransaction], 14, 0);
+
+        const hash = genesisBlock.getHashAsString();
+        // const signale = new Signale();
+        // signale.log('Anything Human can understand!!!');
+        // signale.log('Genesis hash: ', hash);
+
+        this.blocks.push(genesisBlock);
+        this.currentBlock = genesisBlock;
+
+        this.unspentTxOuts = this.processTransactions(this.blocks[0].data, [], 0);
+    }
+
+    private async addBlockToChain(block: Block): Promise<boolean> {
+        const valid = this.isValidNewBlock(block, this.getLatestBlock());
+
+        if (valid) {
+            this.blocks.push(block);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private isValidBlockStructure(block: Block): boolean {
+        const hash = block.getHash();
+
+        return typeof block.index === 'number'
+            && typeof block.timestamp === 'number'
+            && block.previousHash instanceof Buffer
+            && hash instanceof Buffer
+            && (typeof block.data === 'object' || typeof block.data === 'string');
+    }
+
+    private isValidNewBlock(block: Block, prevBlock: Block): boolean {
+        const validBlockStructure = this.isValidBlockStructure(block);
+
+        if (!validBlockStructure) {
+            return false;
+        }
+
+        if ((prevBlock.index + 1) !== block.index) {
+            return false;
+        } else if (!this.isValidTimestamp(block, prevBlock)) {
+            return false;
+        }
+
+        const prevBlockHash: Buffer = prevBlock.getHash();
+
+        if (Buffer.compare(prevBlockHash, block.previousHash) !== 0) {
+            return false;
+        }
+
+        return true;
     }
 
     private findUnspentTxOut(transactionId: string, index: number, unspendTxOuts: UnspentTxOut[]): UnspentTxOut {
-        return unspendTxOuts.find((uTxO) => uTxO.txOutId == transactionId && uTxO.txOutIndex == index);
+        return unspendTxOuts.find((uTxO: UnspentTxOut) => uTxO.txOutId === transactionId && uTxO.txOutIndex === index);
     }
 
     private updateUnspentTxOuts(trans: Transaction[], unspendTxOuts: UnspentTxOut[]): UnspentTxOut[] {
         const newUnspendTxOuts: UnspentTxOut[] = trans
-            .map((T) => {
-                return T.txOuts.map((txOut, index) => new UnspentTxOut(T.id, index, txOut.publicKey, txOut.amount));
-            })
+            .map((T: Transaction) =>
+                T.txOuts.map((txOut, index) =>
+                    new UnspentTxOut(T.id, index, txOut.publicKey, txOut.amount)))
             .reduce((a, b) => a.concat(b));
 
         const consumedTxOuts: UnspentTxOut[] = trans
-            .map((T) => {
-                return T.txIns;
-            })
+            .map((T: Transaction) => T.txIns)
             .reduce((a, b) => a.concat(b))
-            .map((txIn) => new UnspentTxOut(txIn.txId, txIn.txOutIndex, '', 0));
+            .map((txIn: TxIn) => new UnspentTxOut(txIn.txId, txIn.txOutIndex, '', 0));
 
         const resultingUnspendTxOuts = unspendTxOuts
-            .filter((uTxO) => {
-                return !this.findUnspentTxOut(uTxO.txOutId, uTxO.txOutIndex, consumedTxOuts);
-            })
+            .filter((uTxO: UnspentTxOut) => !this.findUnspentTxOut(uTxO.txOutId, uTxO.txOutIndex, consumedTxOuts))
             .concat(newUnspendTxOuts);
 
         return resultingUnspendTxOuts;
-    }
-
-    public processTransactions(trans: Transaction[], unspendTxOuts: UnspentTxOut[], blockIndex: number): UnspentTxOut[] {
-
-        return this.updateUnspentTxOuts(trans, unspendTxOuts);
     }
 }

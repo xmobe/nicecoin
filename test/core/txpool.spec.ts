@@ -22,21 +22,12 @@
  */
 
 import { expect } from 'chai';
-import { company } from 'faker/locale/en';
-import { Block, Chain } from '../../src/core';
+import { TxPool } from '../../src/core';
 
-describe('BlockChain', () => {
-    it(`Should create BlockChain with a Genesis Block`, () => {
-        Chain
-            .getInstance()
-            .then((instance: Chain) => {
-                const chain = instance;
-                const genesisBlock = chain.getCurrentBlock();
-
-                const blockData = company.companyName();
-
-                const block: Block = chain.mine(blockData);
-                expect(block.index).to.equal(1);
-            });
+describe('Transaction Pool', () => {
+    it('Should return a Valid Address', () => {
+        const txPool = new TxPool();
+        /* tslint:disable */
+        expect(txPool.isValidAddress('04210b494b3ae21490abef3e88128e1fd04a1c9ff4aefe177e6f2a33369e6191eddd011004539589ba867bb7353e3d751b6110501d73ac20fd462149dfae914848')).to.equal(true);
     });
 });

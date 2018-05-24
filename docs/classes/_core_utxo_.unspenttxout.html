@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;Wallet&quot; | @xmobe/nicecoin</title>
+	<title>UnspentTxOut | @xmobe/nicecoin</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,27 +56,135 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_wallet_.html">&quot;Wallet&quot;</a>
+					<a href="../modules/_core_utxo_.html">&quot;core/UTXO&quot;</a>
+				</li>
+				<li>
+					<a href="_core_utxo_.unspenttxout.html">UnspentTxOut</a>
 				</li>
 			</ul>
-			<h1>External module &quot;Wallet&quot;</h1>
+			<h1>Class UnspentTxOut</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">UnspentTxOut</span>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Classes</h3>
+							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-external-module"><a href="../classes/_wallet_.wallet.html" class="tsd-kind-icon">Wallet</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_core_utxo_.unspenttxout.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_core_utxo_.unspenttxout.html#address" class="tsd-kind-icon">address</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_core_utxo_.unspenttxout.html#amount" class="tsd-kind-icon">amount</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_core_utxo_.unspenttxout.html#txoutid" class="tsd-kind-icon">tx<wbr>Out<wbr>Id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_core_utxo_.unspenttxout.html#txoutindex" class="tsd-kind-icon">tx<wbr>Out<wbr>Index</a></li>
 							</ul>
 						</section>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Unspent<wbr>TxOut<span class="tsd-signature-symbol">(</span>txOutId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, txOutIndex<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_core_utxo_.unspenttxout.html" class="tsd-signature-type">UnspentTxOut</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/xmobe-com/nicecoin/blob/6636be3/src/core/UTXO.ts#L26">core/UTXO.ts:26</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>constructor</dt>
+									<dd></dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>txOutId: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>txOutIndex: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>address: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>amount: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_core_utxo_.unspenttxout.html" class="tsd-signature-type">UnspentTxOut</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="address" class="tsd-anchor"></a>
+					<h3>address</h3>
+					<div class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/xmobe-com/nicecoin/blob/6636be3/src/core/UTXO.ts#L25">core/UTXO.ts:25</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="amount" class="tsd-anchor"></a>
+					<h3>amount</h3>
+					<div class="tsd-signature tsd-kind-icon">amount<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/xmobe-com/nicecoin/blob/6636be3/src/core/UTXO.ts#L26">core/UTXO.ts:26</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="txoutid" class="tsd-anchor"></a>
+					<h3>tx<wbr>Out<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">tx<wbr>Out<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/xmobe-com/nicecoin/blob/6636be3/src/core/UTXO.ts#L23">core/UTXO.ts:23</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="txoutindex" class="tsd-anchor"></a>
+					<h3>tx<wbr>Out<wbr>Index</h3>
+					<div class="tsd-signature tsd-kind-icon">tx<wbr>Out<wbr>Index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/xmobe-com/nicecoin/blob/6636be3/src/core/UTXO.ts#L24">core/UTXO.ts:24</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -87,33 +195,66 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_block_.html">"<wbr>Block"</a>
+						<a href="../modules/_core_block_.html">"core/<wbr>Block"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_chain_.html">"<wbr>Chain"</a>
+						<a href="../modules/_core_chain_.html">"core/<wbr>Chain"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_transaction_.html">"<wbr>Transaction"</a>
+						<a href="../modules/_core_transaction_.html">"core/<wbr>Transaction"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_transactionin_.html">"<wbr>Transaction<wbr>In"</a>
+						<a href="../modules/_core_transactionin_.html">"core/<wbr>Transaction<wbr>In"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_transactionout_.html">"<wbr>Transaction<wbr>Out"</a>
+						<a href="../modules/_core_transactionout_.html">"core/<wbr>Transaction<wbr>Out"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_utxo_.html">"UTXO"</a>
+						<a href="../modules/_core_transactionpool_.html">"core/<wbr>Transaction<wbr>Pool"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_wallet_.html">"<wbr>Wallet"</a>
+						<a href="../modules/_core_utxo_.html">"core/UTXO"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_core_utils_.html">"core/<wbr>Utils"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_core_index_.html">"core/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_wallet_wallet_.html">"wallet/<wbr>Wallet"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_wallet_index_.html">"wallet/index"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_wallet_.wallet.html" class="tsd-kind-icon">Wallet</a>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_core_utxo_.unspenttxout.html" class="tsd-kind-icon">Unspent<wbr>TxOut</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="_core_utxo_.unspenttxout.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_core_utxo_.unspenttxout.html#address" class="tsd-kind-icon">address</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_core_utxo_.unspenttxout.html#amount" class="tsd-kind-icon">amount</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_core_utxo_.unspenttxout.html#txoutid" class="tsd-kind-icon">tx<wbr>Out<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_core_utxo_.unspenttxout.html#txoutindex" class="tsd-kind-icon">tx<wbr>Out<wbr>Index</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 				</ul>
 			</nav>
 		</div>
