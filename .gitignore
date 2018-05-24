@@ -6,8 +6,12 @@ dist-test/
 data/
 templates/
 <<<<<<< HEAD
+<<<<<<< HEAD
 ./wallet/
 ./wallet/private_key
 =======
 ./wallet
 >>>>>>> 6eadb95... Implement Core
+=======
+wallet/private_key
+>>>>>>> 5775e53... update wallet
