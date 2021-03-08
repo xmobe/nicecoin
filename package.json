@@ -60,7 +60,7 @@
     "@xmobe/user": "^1.0.2",
     "body-parser": "^1.18.2",
     "crypto": "^1.0.1",
-    "elliptic": "^6.4.0",
+    "elliptic": "^6.5.4",
     "express": "^4.16.3",
     "faker": "^4.1.0",
     "gpu.js": "^1.2.0",
